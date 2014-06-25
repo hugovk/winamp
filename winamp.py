@@ -1,94 +1,97 @@
 ###########################################################
-## winamp.py
-## Python Winamp Controller
-##
-## Version 1.1 21-Oct-2006  minor bugfix
-## Version 1.0, 1-Feb-2001
-##
-## About:
-##  Class to control running instance
-##  or Winamp mp3 player on current
-##  machine.
-##
-## Requirements:
-##  Winamp and Win32 (of course).
-##  ActivePython or Win32 Python extensions.
-##  Tested with Winamp 2.71 and ActivePython 2.0
-##  on WinNT4.
-##
-## Usage:
-##  Copy this file anywhere in your
-##  pythonpath.
-##  Create an instance of winamp class
-##  and call methods on it to control
-##  a running winamp program on current
-##  machine.
-##
-##  Example:
-##    >>> import winamp
-##    >>> w = winamp.winamp()
-##    >>> w.getPlayingStatus()
-##    'stopped'
-##    >>> w.play()
-##    >>> w.getPlayingStatus()
-##    'playing'
-##    >>>
-##
-## Uses the winamp api http://www.winamp.com
-## /nsdn/winamp2x/dev/sdk/api.jhtml
-## and windows messaging to control winamp.
-##
-## 
-## Copyright (c) 2001-2006, Shalabh Chaturvedi
-##
-## Permission is hereby granted, free of charge, to any
-## person obtaining a copy of this software and associated
-## documentation files (the "Software"), to deal in the
-## Software without restriction, including without 
-## limitation the rights to use, copy, modify, merge, 
-## publish, distribute, sublicense, and/or sell copies of 
-## the Software, and to permit persons to whom the Software 
-## is furnished to do so, subject to the following 
-## conditions:
-##
-## The above copyright notice and this permission notice 
-## shall be included in all copies or substantial portions 
-## of the Software.
-##
-## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY 
-## KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO 
-## THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-## PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-## THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-## DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
-## CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-## CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
-## IN THE SOFTWARE.
-##
+# winamp.py
+# Python Winamp Controller
+#
+# Version 1.1 21-Oct-2006  minor bugfix
+# Version 1.0, 1-Feb-2001
+#
+# About:
+#  Class to control running instance
+#  or Winamp mp3 player on current
+#  machine.
+#
+# Requirements:
+#  Winamp and Win32 (of course).
+#  ActivePython or Win32 Python extensions.
+#  Tested with Winamp 2.71 and ActivePython 2.0
+#  on WinNT4.
+#
+# Usage:
+#  Copy this file anywhere in your
+#  pythonpath.
+#  Create an instance of winamp class
+#  and call methods on it to control
+#  a running winamp program on current
+#  machine.
+#
+#  Example:
+#    >>> import winamp
+#    >>> w = winamp.winamp()
+#    >>> w.getPlayingStatus()
+#    'stopped'
+#    >>> w.play()
+#    >>> w.getPlayingStatus()
+#    'playing'
+#    >>>
+#
+# Uses the winamp api http://www.winamp.com
+# /nsdn/winamp2x/dev/sdk/api.jhtml
+# and windows messaging to control winamp.
+#
+#
+# Copyright (c) 2001-2006, Shalabh Chaturvedi
+#
+# Permission is hereby granted, free of charge, to any
+# person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the
+# Software without restriction, including without
+# limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software
+# is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice
+# shall be included in all copies or substantial portions
+# of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+# KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+# THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+# CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+#
 ###########################################################
 
-import win32gui
+import argparse
 import win32api
+import win32gui
 
 # wonder why win32 imports dont define these
 WM_COMMAND = 0x0111
-WM_USER    = 0x400
+WM_USER = 0x400
+
 
 def voidfunc():
     pass
 
+
 class winamp:
 
-    winamp_commands = { 'prev'    :40044,
-                        'next'    :40048,
-                        'play'    :40045,
-                        'pause'   :40046,
-                        'stop'    :40047,
-                        'fadeout' :40157,
-                        'forward' :40148,
-                        'rewind'  :40144,
-                        'raisevol':40058,
-                        'lowervol':40059}
+    winamp_commands = {'prev'    : 40044,
+                       'next'    : 40048,
+                       'play'    : 40045,
+                       'pause'   : 40046,
+                       'stop'    : 40047,
+                       'fadeout' : 40157,
+                       'forward' : 40148,
+                       'rewind'  : 40144,
+                       'raisevol': 40058,
+                       'lowervol': 40059}
 
     def __init__(self):
         self.hWinamp = win32gui.FindWindow('Winamp v1.x', None)
@@ -110,7 +113,7 @@ class winamp:
 
     def usercommand(self, id, data=0):
         return win32api.SendMessage(self.hWinamp, WM_USER, data, id)
-        
+
     def getVersion(self):
         "returns the version number of winamp"
         return self.sVersion
@@ -124,15 +127,16 @@ class winamp:
             return 'paused'
         else:
             return 'stopped'
-            
+
     def getTrackStatus(self):
         "returns a tuple (total_length, current_position) where both are in msecs"
-        iTotalLength = self.usercommand(105, 1) * 1000 # the usercommand returns the number in seconds
-        iCurrentPos  = self.usercommand(105, 0)
+        # the usercommand returns the number in seconds:
+        iTotalLength = self.usercommand(105, 1) * 1000
+        iCurrentPos = self.usercommand(105, 0)
         return (iTotalLength, iCurrentPos)
 
     def setCurrentTrack(self, iTrackNumber):
-        "changes the track selection to the number specified"        
+        "changes the track selection to the number specified"
         return self.usercommand(121, iTrackNumber)
 
     def getCurrentTrack(self):
@@ -144,7 +148,7 @@ class winamp:
     def seekWithinTrack(self, iPositionMsecs):
         "seeks within currently playing track to specified milliseconds since start"
         return self.usercommand(106, iPositionMsecs)
-        
+
     def setVolume(self, iVolumeLevel):
         "sets the volume to number specified (range is 0 to 255)"
         return self.usercommand(122, iVolumeLevel)
@@ -155,9 +159,9 @@ class winamp:
 
     def getTrackInfo(self):
         "returns a tuple (samplerate, bitrate, number of channels)"
-        iSampleRate = self.usercommand(126,0)
-        iBitRate = self.usercommand(126,1)
-        iNumChannels = self.usercommand(126,2)
+        iSampleRate = self.usercommand(126, 0)
+        iBitRate = self.usercommand(126, 1)
+        iNumChannels = self.usercommand(126, 2)
         return (iSampleRate, iBitRate, iNumChannels)
 
     def dumpList(self):
@@ -171,7 +175,47 @@ def getTrackList(sPlaylistFilepath):
     playlistfile.close()
     playlist = []
     for line in lines:
-        if not line[0]=='#':
+        if not line[0] == '#':
             playlist.append(line[:-1])
     return playlist
 
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="TODO",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        'command',  nargs='?',
+        help="Command")
+    parser.add_argument(
+        'subcommand',  nargs='?',
+        help="Sub-command")
+    args = parser.parse_args()
+
+
+    w = winamp()
+
+    if args.command == "status":
+        # state = w.getPlayingStatus()
+        # print(state)
+        print(w.getCurrentTrackName())
+        # if state == "playing":
+
+    elif args.command == "vol":
+        if args.subcommand == "up":
+            # TODO: increase volume by 10%
+            w.command("raisevol")
+        elif args.subcommand == "down":
+            # TODO: decrease volume by 10%
+            w.command("lowervol")
+        elif args.subcommand:
+            print args.subcommand
+            # scale volume 0-100 to 0-255
+            newvol = float(args.subcommand) * 255 / 100
+            print newvol
+            w.setVolume(newvol)
+
+    elif args.command:
+        w.command(args.command)
+
+# End of file
