@@ -102,7 +102,7 @@ class winamp:
         self.sVersion = sVersionString
 
     def command(self, sCommand):
-        if winamp.winamp_commands.has_key(sCommand):
+        if sCommand in winamp.winamp_commands:
             return win32api.SendMessage(self.hWinamp, WM_COMMAND, winamp.winamp_commands[sCommand], 0)
         else:
             raise 'NoSuchWinampCommand'
@@ -209,10 +209,10 @@ if __name__ == "__main__":
             # TODO: decrease volume by 10%
             w.command("lowervol")
         elif args.subcommand:
-            print args.subcommand
+            print(args.subcommand)
             # scale volume 0-100 to 0-255
             newvol = float(args.subcommand) * 255 / 100
-            print newvol
+            print(newvol)
             w.setVolume(newvol)
 
     elif args.command:
