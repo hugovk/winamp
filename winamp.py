@@ -26,7 +26,7 @@
 #
 #  Example:
 #    >>> import winamp
-#    >>> w = winamp.winamp()
+#    >>> w = winamp.Winamp()
 #    >>> w.getPlayingStatus()
 #    'stopped'
 #    >>> w.play()
@@ -67,7 +67,10 @@
 #
 ###########################################################
 
+import wa_ipc as ipc
+
 import argparse
+import sys
 import win32api
 import win32gui
 
@@ -76,40 +79,46 @@ WM_COMMAND = 0x0111
 WM_USER = 0x400
 
 
-def voidfunc():
+class NoWinampOpened(Exception):
     pass
 
 
-class winamp:
+class Winamp:
 
-    winamp_commands = {'prev'    : 40044,
-                       'next'    : 40048,
-                       'play'    : 40045,
-                       'pause'   : 40046,
-                       'stop'    : 40047,
-                       'fadeout' : 40157,
-                       'forward' : 40148,
-                       'rewind'  : 40144,
-                       'raisevol': 40058,
-                       'lowervol': 40059}
+    COMMANDS = {
+        "prev": ipc.WINAMP_BUTTON1,
+        "next": ipc.WINAMP_BUTTON5,
+        "play": ipc.WINAMP_BUTTON2,
+        "pause": ipc.WINAMP_BUTTON3,
+        "stop": ipc.WINAMP_BUTTON4,
+        "fadeout": ipc.WINAMP_BUTTON4_CTRL,
+        "forward": ipc.WINAMP_BUTTON5_SHIFT,
+        "rewind": ipc.WINAMP_BUTTON1_SHIFT,
+        "raisevol": ipc.WINAMP_VOLUMEUP,
+        "lowervol": ipc.WINAMP_VOLUMEDOWN,
+    }
 
     def __init__(self):
-        self.hWinamp = win32gui.FindWindow('Winamp v1.x', None)
+        self.hWinamp = win32gui.FindWindow("Winamp v1.x", None)
+        if self.hWinamp is 0:
+            raise NoWinampOpened()
 
         iVersionNumber = self.usercommand(0)
         sVersionString = hex(iVersionNumber)
-        sVersionString = sVersionString[2:3] + '.' + sVersionString[3:]
+        sVersionString = sVersionString[2:3] + "." + sVersionString[3:]
         self.sVersion = sVersionString
 
     def command(self, sCommand):
-        if sCommand in winamp.winamp_commands:
-            return win32api.SendMessage(self.hWinamp, WM_COMMAND, winamp.winamp_commands[sCommand], 0)
+        if sCommand in Winamp.COMMANDS:
+            return win32api.SendMessage(
+                self.hWinamp, WM_COMMAND, Winamp.COMMANDS[sCommand], 0
+            )
         else:
-            raise 'NoSuchWinampCommand'
+            raise "NoSuchWinampCommand"
 
     def __getattr__(self, attr):
         self.command(attr)
-        return voidfunc
+        return lambda: None
 
     def usercommand(self, id, data=0):
         return win32api.SendMessage(self.hWinamp, WM_USER, data, id)
@@ -120,53 +129,53 @@ class winamp:
 
     def getPlayingStatus(self):
         "returns the current status string which is one of 'playing', 'paused' or 'stopped'"
-        iStatus = self.usercommand(104)
+        iStatus = self.usercommand(ipc.IPC_ISPLAYING)
         if iStatus == 1:
-            return 'playing'
+            return "playing"
         elif iStatus == 3:
-            return 'paused'
+            return "paused"
         else:
-            return 'stopped'
+            return "stopped"
 
     def getTrackStatus(self):
         "returns a tuple (total_length, current_position) where both are in msecs"
         # the usercommand returns the number in seconds:
-        iTotalLength = self.usercommand(105, 1) * 1000
-        iCurrentPos = self.usercommand(105, 0)
+        iTotalLength = self.usercommand(ipc.IPC_GETOUTPUTTIME, 1) * 1000
+        iCurrentPos = self.usercommand(ipc.IPC_GETOUTPUTTIME, 0)
         return (iTotalLength, iCurrentPos)
 
     def setCurrentTrack(self, iTrackNumber):
         "changes the track selection to the number specified"
-        return self.usercommand(121, iTrackNumber)
+        return self.usercommand(ipc.IPC_SETPLAYLISTPOS, iTrackNumber)
 
     def getCurrentTrack(self):
-        return self.usercommand(125)
+        return self.usercommand(ipc.IPC_GETLISTPOS)
 
     def getCurrentTrackName(self):
         return win32gui.GetWindowText(self.hWinamp)
 
     def seekWithinTrack(self, iPositionMsecs):
         "seeks within currently playing track to specified milliseconds since start"
-        return self.usercommand(106, iPositionMsecs)
+        return self.usercommand(ipc.IPC_JUMPTOTIME, iPositionMsecs)
 
     def setVolume(self, iVolumeLevel):
         "sets the volume to number specified (range is 0 to 255)"
-        return self.usercommand(122, iVolumeLevel)
+        return self.usercommand(ipc.IPC_SETVOLUME, iVolumeLevel)
 
     def getNumTracks(self):
         "returns number of tracks in current playlist"
-        return self.usercommand(124)
+        return self.usercommand(ipc.IPC_GETLISTLENGTH)
 
     def getTrackInfo(self):
         "returns a tuple (samplerate, bitrate, number of channels)"
-        iSampleRate = self.usercommand(126, 0)
-        iBitRate = self.usercommand(126, 1)
-        iNumChannels = self.usercommand(126, 2)
+        iSampleRate = self.usercommand(ipc.IPC_GETINFO, 0)
+        iBitRate = self.usercommand(ipc.IPC_GETINFO, 1)
+        iNumChannels = self.usercommand(ipc.IPC_GETINFO, 2)
         return (iSampleRate, iBitRate, iNumChannels)
 
     def dumpList(self):
         "dumps the current playlist into WINAMPDIR/winamp.m3u"
-        return self.usercommand(120)
+        return self.usercommand(ipc.IPC_WRITEPLAYLIST)
 
 
 def getTrackList(sPlaylistFilepath):
@@ -174,26 +183,28 @@ def getTrackList(sPlaylistFilepath):
     lines = playlistfile.readlines()
     playlistfile.close()
     playlist = []
-    for line in lines:
-        if not line[0] == '#':
-            playlist.append(line[:-1])
+    with open(sPlaylistFilepath, "r") as playlistfile:
+        for line in playlistfile.readlines():
+            if line.startswith("#"):
+                continue
+            playlist.append(line.strip())
     return playlist
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="TODO",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
-        'command',  nargs='?',
-        help="Command")
-    parser.add_argument(
-        'subcommand',  nargs='?',
-        help="Sub-command")
+        description="Winamp control",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("command", nargs="?", default="status", help="Command")
+    parser.add_argument("subcommand", nargs="?", help="Sub-command")
     args = parser.parse_args()
 
-
-    w = winamp()
+    try:
+        w = Winamp()
+    except NoWinampOpened:
+        sys.stderr.write("Winamp not open.\n")
+        sys.exit(1)
 
     if args.command == "status":
         # state = w.getPlayingStatus()
