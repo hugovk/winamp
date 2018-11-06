@@ -179,9 +179,6 @@ class Winamp:
 
 
 def getTrackList(sPlaylistFilepath):
-    playlistfile = open(sPlaylistFilepath, "r")
-    lines = playlistfile.readlines()
-    playlistfile.close()
     playlist = []
     with open(sPlaylistFilepath, "r") as playlistfile:
         for line in playlistfile.readlines():
