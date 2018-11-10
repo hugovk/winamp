@@ -143,7 +143,7 @@ class Winamp:
         # the usercommand returns the number in seconds:
         iTotalLength = self.usercommand(ipc.IPC_GETOUTPUTTIME, 1) * 1000
         iCurrentPos = self.usercommand(ipc.IPC_GETOUTPUTTIME, 0)
-        return (iTotalLength, iCurrentPos)
+        return iTotalLength, iCurrentPos
 
     def setCurrentTrack(self, iTrackNumber):
         """Changes the track selection to the number specified"""
@@ -172,7 +172,7 @@ class Winamp:
         iSampleRate = self.usercommand(ipc.IPC_GETINFO, 0)
         iBitRate = self.usercommand(ipc.IPC_GETINFO, 1)
         iNumChannels = self.usercommand(ipc.IPC_GETINFO, 2)
-        return (iSampleRate, iBitRate, iNumChannels)
+        return iSampleRate, iBitRate, iNumChannels
 
     def dumpList(self):
         """Dumps the current playlist into WINAMPDIR/winamp.m3u"""
