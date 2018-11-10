@@ -128,7 +128,8 @@ class Winamp:
         return self.sVersion
 
     def getPlayingStatus(self):
-        "returns the current status string which is one of 'playing', 'paused' or 'stopped'"
+        """returns the current status string which is one of
+        'playing', 'paused' or 'stopped'"""
         iStatus = self.usercommand(ipc.IPC_ISPLAYING)
         if iStatus == 1:
             return "playing"
