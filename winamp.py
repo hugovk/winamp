@@ -114,7 +114,7 @@ class Winamp:
                 self.hWinamp, WM_COMMAND, Winamp.COMMANDS[sCommand], 0
             )
         else:
-            raise "NoSuchWinampCommand"
+            raise Exception("NoSuchWinampCommand")
 
     def __getattr__(self, attr):
         self.command(attr)
