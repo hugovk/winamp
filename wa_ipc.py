@@ -1,13 +1,13 @@
 # This is an incomplete set of constants derived from wa_ipc.h
 
-WINAMP_OPTIONS_EQ = 40036     # toggles the EQ window
-WINAMP_OPTIONS_PLEDIT = 40040 # toggles the playlist window
-WINAMP_VOLUMEUP = 40058       # turns the volume up a little
-WINAMP_VOLUMEDOWN = 40059     # turns the volume down a little
-WINAMP_FFWD5S = 40060         # fast forwards 5 seconds
-WINAMP_REW5S = 40061          # rewinds 5 seconds
+WINAMP_OPTIONS_EQ = 40036  # toggles the EQ window
+WINAMP_OPTIONS_PLEDIT = 40040  # toggles the playlist window
+WINAMP_VOLUMEUP = 40058  # turns the volume up a little
+WINAMP_VOLUMEDOWN = 40059  # turns the volume down a little
+WINAMP_FFWD5S = 40060  # fast forwards 5 seconds
+WINAMP_REW5S = 40061  # rewinds 5 seconds
 
-# the following are the five main control buttons, with optionally shift 
+# the following are the five main control buttons, with optionally shift
 # or control pressed
 # (for the exact functions of each, just try it out)
 WINAMP_BUTTON1 = 40044
@@ -54,7 +54,7 @@ IPC_JUMPTOTIME = 106
 # formats do not provide exact seeking e.g. mp3
 # This returns -1 if Winamp is not playing, 1 on end of file, or 0 if it was successful.
 
-IPC_GETMODULENAME= 109
+IPC_GETMODULENAME = 109
 IPC_EX_ISRIGHTEXE = 666
 # usually shouldnt bother using these, but here goes:
 # send a WM_COPYDATA with IPC_GETMODULENAME, and an internal
