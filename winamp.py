@@ -124,11 +124,11 @@ class Winamp:
         return win32api.SendMessage(self.hWinamp, WM_USER, data, id)
 
     def getVersion(self):
-        "returns the version number of winamp"
+        """Returns the version number of Winamp"""
         return self.sVersion
 
     def getPlayingStatus(self):
-        """returns the current status string which is one of
+        """Returns the current status string which is one of
         'playing', 'paused' or 'stopped'"""
         iStatus = self.usercommand(ipc.IPC_ISPLAYING)
         if iStatus == 1:
@@ -139,14 +139,14 @@ class Winamp:
             return "stopped"
 
     def getTrackStatus(self):
-        "returns a tuple (total_length, current_position) where both are in msecs"
+        """Returns a tuple (total_length, current_position) where both are in msecs"""
         # the usercommand returns the number in seconds:
         iTotalLength = self.usercommand(ipc.IPC_GETOUTPUTTIME, 1) * 1000
         iCurrentPos = self.usercommand(ipc.IPC_GETOUTPUTTIME, 0)
         return (iTotalLength, iCurrentPos)
 
     def setCurrentTrack(self, iTrackNumber):
-        "changes the track selection to the number specified"
+        """Changes the track selection to the number specified"""
         return self.usercommand(ipc.IPC_SETPLAYLISTPOS, iTrackNumber)
 
     def getCurrentTrack(self):
@@ -156,26 +156,26 @@ class Winamp:
         return win32gui.GetWindowText(self.hWinamp)
 
     def seekWithinTrack(self, iPositionMsecs):
-        "seeks within currently playing track to specified milliseconds since start"
+        """Seeks within currently playing track to specified milliseconds since start"""
         return self.usercommand(ipc.IPC_JUMPTOTIME, iPositionMsecs)
 
     def setVolume(self, iVolumeLevel):
-        "sets the volume to number specified (range is 0 to 255)"
+        """Sets the volume to number specified (range is 0 to 255)"""
         return self.usercommand(ipc.IPC_SETVOLUME, iVolumeLevel)
 
     def getNumTracks(self):
-        "returns number of tracks in current playlist"
+        """Returns number of tracks in current playlist"""
         return self.usercommand(ipc.IPC_GETLISTLENGTH)
 
     def getTrackInfo(self):
-        "returns a tuple (samplerate, bitrate, number of channels)"
+        """Returns a tuple (samplerate, bitrate, number of channels)"""
         iSampleRate = self.usercommand(ipc.IPC_GETINFO, 0)
         iBitRate = self.usercommand(ipc.IPC_GETINFO, 1)
         iNumChannels = self.usercommand(ipc.IPC_GETINFO, 2)
         return (iSampleRate, iBitRate, iNumChannels)
 
     def dumpList(self):
-        "dumps the current playlist into WINAMPDIR/winamp.m3u"
+        """Dumps the current playlist into WINAMPDIR/winamp.m3u"""
         return self.usercommand(ipc.IPC_WRITEPLAYLIST)
 
 
