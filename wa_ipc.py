@@ -1,13 +1,13 @@
 # This is an incomplete set of constants derived from wa_ipc.h
 
-WINAMP_OPTIONS_EQ = 40036     # toggles the EQ window
-WINAMP_OPTIONS_PLEDIT = 40040 # toggles the playlist window
-WINAMP_VOLUMEUP = 40058       # turns the volume up a little
-WINAMP_VOLUMEDOWN = 40059     # turns the volume down a little
-WINAMP_FFWD5S = 40060         # fast forwards 5 seconds
-WINAMP_REW5S = 40061          # rewinds 5 seconds
+WINAMP_OPTIONS_EQ = 40036  # toggles the EQ window
+WINAMP_OPTIONS_PLEDIT = 40040  # toggles the playlist window
+WINAMP_VOLUMEUP = 40058  # turns the volume up a little
+WINAMP_VOLUMEDOWN = 40059  # turns the volume down a little
+WINAMP_FFWD5S = 40060  # fast forwards 5 seconds
+WINAMP_REW5S = 40061  # rewinds 5 seconds
 
-# the following are the five main control buttons, with optionally shift 
+# the following are the five main control buttons, with optionally shift
 # or control pressed
 # (for the exact functions of each, just try it out)
 WINAMP_BUTTON1 = 40044
@@ -54,7 +54,7 @@ IPC_JUMPTOTIME = 106
 # formats do not provide exact seeking e.g. mp3
 # This returns -1 if Winamp is not playing, 1 on end of file, or 0 if it was successful.
 
-IPC_GETMODULENAME= 109
+IPC_GETMODULENAME = 109
 IPC_EX_ISRIGHTEXE = 666
 # usually shouldnt bother using these, but here goes:
 # send a WM_COPYDATA with IPC_GETMODULENAME, and an internal
@@ -77,9 +77,10 @@ IPC_WRITEPLAYLIST = 120
 # From 2.90 to 5.1 -> Use IPC_GETINIDIRECTORY
 # From 5.11 -> Use IPC_GETM3UDIRECTORY
 #
-# If working from an external program then it is possible to work out the location of the
-# playlist by reading relevant values out of paths.ini (if found) otherwise the pre 2.90
-# behaviour is what will be attempted to be used (as Winamp does if there is any failure).
+# If working from an external program then it is possible to work out the location of
+# the playlist by reading relevant values out of paths.ini (if found) otherwise the pre
+# 2.90 behaviour is what will be attempted to be used (as Winamp does if there is any
+# failure).
 #
 # This is kinda obsoleted by some of the newer 2.x api items but it still is good for
 # use with a front-end program (instead of a plug-in) and you want to see what is in the
@@ -108,7 +109,8 @@ IPC_SETVOLUME = 122
 # If you pass 'volume' as -666 then the message will return the current volume.
 # int curvol = SendMessage(hwnd_winamp,WM_WA_IPC,-666,IPC_SETVOLUME);
 
-# IPC_GETVOLUME(hwnd_winamp) SendMessage(hwnd_winamp,WM_WA_IPC,(WPARAM)-666,IPC_SETVOLUME)
+# IPC_GETVOLUME(hwnd_winamp) SendMessage(hwnd_winamp,WM_WA_IPC,(WPARAM)-666,
+#                                        IPC_SETVOLUME)
 # (requires Winamp 2.0+)
 # int curvol = IPC_GETVOLUME(hwnd_winamp);
 # This will return the current volume of Winamp (between the range of 0 to 255).
@@ -128,8 +130,8 @@ IPC_SETBALANCE = 123
 # IPC_GETBALANCE(hwnd_winamp) SendMessage(hwnd_winamp,WM_WA_IPC,-666,IPC_SETBALANCE)
 # (requires Winamp 2.0+)
 # int curpan = IPC_GETPANNING(hwnd_winamp);
-# This will return the current panning level of Winamp (5.x) from -127 (left) to 127 (right)
-# or from 0 (left) to 255 (right) on older client versions.
+# This will return the current panning level of Winamp (5.x) from -127 (left) to 127
+# (right) or from 0 (left) to 255 (right) on older client versions.
 
 IPC_GETLISTLENGTH = 124
 # (requires Winamp 2.0+)
